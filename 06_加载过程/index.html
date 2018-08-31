@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>ES6与CommanJS模块加载的不同</h1>
+  <hr>
+  <h4>
+    CommanJS在require命令第一次加载脚本的时候会执行整个脚本，然后在内存中生成一个对象。
+  </h4>
+  <h4 style="color:red;">
+    如果再次加载同一模块，不会再执行该模块，而是到缓存中去取值。<br>
+    对于循环加载，只输出已经执行的部分，没有执行的不会输出。
+  </h4>
+  <pre>
+    {
+      id:'',
+      exports:{...},
+      loaded:true
+    }
+  </pre>
+  <h4>
+    id属于属性名，exports属性表示模块输出的各个接口，loaded表示该模块是否执行完毕,（还有很多）。
+    所以叫运行时加载，exports中的值是复制的，当然是浅复制。（对象是引用）
+    以后需要用到这个模块中的值的时候，就回到exports中取值。require完毕之后，exports就不会再改变了。
+  </h4>
+  <pre>
+      num=3;
+      function incCounter(){
+        num++;
+      }
+      function conNum(){
+        console.log(num);
+      }
+      num=4;
+      module.exports={num,incCounter,conNum}   
+  </pre>
+  <h4>
+    假设上面是另一个模块，当前模块引入该模块的时候，在内存中创建一个对象，exports对象中x开始赋值为3，然后inCounter
+    为一个函数引用，和原模块指向同一个地方。随后expots中的num被赋值为4。这个和执行该一段上下文一样。
+    <h2>
+      这个过程就和执行代码一样，好像也会创建VO,它也存在变量提升，函数的整个提升。所以说函数此时被创建，保存的作用域链
+      是被引入模块的。而引入的模块的函数是同一个引用，执行该函数改变的是原来模块里面的值，而exports中的在loaded之后就不再改变了
+    </h2>
+    当该模块引用完毕，其他模块都是从这块内存中的exports取值。
+    也就是说，无论CommanJS模块被挤在多少次，都只会在第一次加载时运行一次，以后再加载也是返回一样的效果，除非手动清除系统缓存。
+  </h4>
+  <div style="width:100%;height:0;border:5px solid red;"></div>
+  <h2>ES6</h2>
+  <h4>
+    在import的时候，只生成一个动态的只读引用，等到代码真正执行到的时候，它才会根据这个只读引用去被加载的模块中执行。
+  </h4>
+  <p>只读引用的意思就是不论你是原始数据类型还是对象，都是引用。原始值发生变化，import的值也会发生改变</p>
+  <h4>编译时加载</h4>
+</body>
+</html>
